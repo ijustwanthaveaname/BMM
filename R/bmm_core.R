@@ -1743,18 +1743,3 @@ plot_theta_comparison <- function(result_3comp, result_4comp) {
 ################################################################################
 # Finished
 ################################################################################
-
-cat("\n>>> MR Model Comparison with Weighted Mode (FINAL VERSION) Loaded\n")
-cat(">>> Key improvements:\n")
-cat("    1. ✓ Removed MR-Mix spike-detection (no 2-comp vs 4-comp conflict)\n")
-cat("    2. ✓ Integrated Weighted Mode (Hartwig 2017) for robust initialization\n")
-cat("    3. ✓ All other features preserved\n\n")
-cat(">>> Usage:\n")
-cat("    1. compiled_models <- compile_stan_models()\n")
-cat("    2. results <- run_mr_model_comparison(\n")
-cat("           beta_X, beta_Y, se_X, se_Y,\n")
-cat("           compiled_models = compiled_models,\n")
-cat("           use_weighted_mode = TRUE  # Default\n")
-cat("       )\n")
-cat("    3. plot_model_comparison(results$comparison)\n\n")
-cat(">>> Weighted Mode is now the default robust initialization method!\n\n")
