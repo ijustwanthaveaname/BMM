@@ -65,7 +65,7 @@ get_proxy <- function(exp_dat, otc_dat, r2 = 0.8,
       next
     }
     
-    proxies.df <- read_table(ld_file, show_col_types = FALSE)
+    proxies.df <- readr::read_table(ld_file, show_col_types = FALSE)
     
     # Select best proxy (highest R2) that's in outcome data
     top_proxies.df <- proxies.df %>% 
