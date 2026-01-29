@@ -249,7 +249,7 @@ read_gwas_data <- function(file_path,
     dplyr::filter(SNP != ".", SNP != "", nchar(SNP) > 0) %>%
     dplyr::filter(is.finite(BETA), is.finite(SE), is.finite(P)) %>%
     dplyr::filter(SE > 0, P > 0, P <= 1) %>%
-    dplyr::filter(str_detect(SNP, "^rs\\d+"))
+    dplyr::filter(stringr::str_detect(SNP, "^rs\\d+"))
   
   cat(sprintf("  Clean data: %d variants\n", nrow(std_data)))
   

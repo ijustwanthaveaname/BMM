@@ -36,6 +36,7 @@ Imports:
     magrittr,
     ggplot2,
     glue,
+    stringr,
     MCMCpack
 Suggests:
     cmdstanr,
