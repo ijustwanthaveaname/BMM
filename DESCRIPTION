@@ -20,7 +20,6 @@ BugReports: https://github.com/your-username/BMM/issues
 Depends: 
     R (>= 4.0.0)
 Imports:
-    cmdstanr,
     posterior,
     bayesplot,
     loo,
@@ -38,6 +37,7 @@ Imports:
     glue,
     MCMCpack
 Suggests:
+    cmdstanr,
     TwoSampleMR,
     ieugwasr,
     MR.CUE,
