@@ -71,7 +71,7 @@ get_proxy <- function(exp_dat, otc_dat, r2 = 0.8,
       dplyr::filter(SNP_A != SNP_B, SNP_B %in% remain.otcsnps) %>% 
       dplyr::arrange(-R2) %>% 
       head(1) %>% 
-      rename(RS_Number = SNP_B)
+      dplyr::rename(RS_Number = SNP_B)
     
     # Clean up temporary files
     file.remove(ld_file)
@@ -391,7 +391,7 @@ harmonize_for_mr <- function(exp_gwas, otc_gwas,
   
   rsid_pval_exp <- exp_dat %>%
     dplyr::select(SNP, pval.exposure) %>%
-    rename(rsid = SNP, pval = pval.exposure) %>%
+    dplyr::rename(rsid = SNP, pval = pval.exposure) %>%
     dplyr::filter(!is.na(rsid), nzchar(rsid))
   
   rsid_pval_exp.clump <- tryCatch({
