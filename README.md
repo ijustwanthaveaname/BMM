@@ -9,16 +9,25 @@ MRBMM implements a robust Bayesian mixture model for Mendelian Randomization tha
 ### Key Features
 
 ✅ **Explicit pleiotropy modeling** - Handles UHP and CHP with 3/4-component models  
-✅ **Robust initialization** - Weighted Mode estimation (Hartwig et al. 2017)  
 ✅ **Automatic model selection** - LOO-CV based comparison  
-✅ **Comprehensive harmonization** - Local plink-based proxy SNP search  
+✅ **Comprehensive harmonization** - Local plink-based proxy SNP search; harmonized data can be used directly with TwoSampleMR's `mr()` function to run multiple MR methods
 ✅ **Sample overlap correction** - Support for overlapping samples  
 ✅ **Parallel processing** - Multi-core MCMC sampling  
 
 ## Installation
 
-### Prerequisites
+### Install BMM
 
+```r
+# From GitHub
+devtools::install_github("ijustwanthaveaname/MRBMM")
+
+# Or from source
+R CMD INSTALL MRBMM_1.0.0.tar.gz
+```
+
+### Prerequisites
+#### Install cmdstanr, cmdstan, TwoSampleMR and ieugwasr using R
 ```r
 # 1. Install cmdstanr
 install.packages("cmdstanr", 
@@ -31,34 +40,26 @@ remotes::install_github("MRCIEU/TwoSampleMR")
 remotes::install_github("MRCIEU/ieugwasr")
 # OR install in 1 line 
 install_bmm_dependencies()
-# if failed use conda
-# conda install -c conda-forge cmdstan
-# Then, tell R where to find it
-library(cmdstanr)
-set_cmdstan_path("PATH_TO_YOUR_CONDA_ENV/bin/cmdstan") 
-# Usually: ~/miniconda3/bin/cmdstan 
-# 3. Install plink (system requirement)
-# Ubuntu/Debian: sudo apt-get install plink
-# macOS: brew install plink
-# Or download from: https://www.cog-genomics.org/plink/
 ```
-
-### Install BMM
-
+#### Install cmdstanr using conda
+if failed use conda
+`conda install -c conda-forge cmdstan`
+Then, tell R where to find it
 ```r
-# From GitHub
-devtools::install_github("ijustwanthaveaname/MRBMM")
-
-# Or from source
-R CMD INSTALL MRBMM_1.0.0.tar.gz
+library(cmdstanr)
+set_cmdstan_path("PATH_TO_YOUR_CONDA_ENV/bin/cmdstan")
+ # Usually: ~/miniconda3/bin/cmdstan 
 ```
+#### Install plink and reference panel for clumping and proxy SNP searching
+**PLINK v1.9**: Download from: https://www.cog-genomics.org/plink/
+**1000 genome phase 3 reference panel**: Download from: https://cncr.nl/research/magma/
+Unpack reference panel `gunzip g1000_EUR.zip`.
 
 ## Quick Start
-
 ```r
 library(MRBMM)
 
-# ⚠️ CRITICAL: Set environment variable
+# Assign the appropriate value to TBB_CXX_TYPE
 Sys.setenv(TBB_CXX_TYPE = "gcc")
 
 # Paths to plink and reference panel
@@ -146,10 +147,7 @@ Number of SNPs used: 127
 ```
 
 ## Documentation
-
 - [Complete Workflow](examples/complete_workflow.R) - End-to-end analysis
-- [Function Reference](https://ijustwanthaveaname.github.io/BMM/reference/) - All functions
-- User Guide (coming soon)
 
 ## Method
 
@@ -167,17 +165,6 @@ BMM uses a Bayesian mixture model to classify SNPs into:
 4. **NULL** - Null IVs
 
 Model selection via LOO-CV. Weighted Mode provides robust initialization.
-
-## Citation
-
-```
-[Your citation will go here]
-
-For Weighted Mode:
-Hartwig FP, Davey Smith G, Bowden J. Robust inference in summary data 
-Mendelian randomization via the zero modal pleiotropy assumption. 
-Int J Epidemiol. 2017;46(6):1985-1998.
-```
 
 ## License
 
