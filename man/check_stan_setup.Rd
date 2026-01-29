@@ -2,11 +2,17 @@
 % Please edit documentation in R/zzz.R
 \name{check_stan_setup}
 \alias{check_stan_setup}
-\title{Check Stan Setup}
+\title{Check Stan setup for BMM}
 \usage{
 check_stan_setup()
 }
-\description{
-Check Stan Setup
+\value{
+Invisibly returns TRUE if CmdStan is available, FALSE otherwise.
 }
-\keyword{internal}
+\description{
+Verify that \pkg{cmdstanr} and CmdStan are correctly installed
+and available for model fitting.
+}
+\details{
+This function is intentionally NOT called during package loading.
+}
