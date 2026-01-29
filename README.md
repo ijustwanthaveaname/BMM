@@ -10,8 +10,8 @@ MRBMM implements a robust Bayesian mixture model for Mendelian Randomization tha
 
 ✅ **Explicit pleiotropy modeling** - Handles UHP and CHP with 3/4-component models  
 ✅ **Automatic model selection** - LOO-CV based comparison  
-✅ **Comprehensive harmonization** - Local plink-based proxy SNP search; harmonized data can be used directly with TwoSampleMR's `mr()` function to run multiple MR methods
-✅ **Sample overlap correction** - Support for overlapping samples  
+✅ **Comprehensive harmonization** - Local plink-based proxy SNP search; harmonized data can be used directly with TwoSampleMR's **mr()** function to run multiple MR methods
+✅ **Sample overlap correction** - Support for overlapping samples 
 ✅ **Parallel processing** - Multi-core MCMC sampling  
 
 ## Installation
@@ -54,6 +54,63 @@ set_cmdstan_path("PATH_TO_YOUR_CONDA_ENV/bin/cmdstan")
 **PLINK v1.9**: Download from: https://www.cog-genomics.org/plink/
 **1000 genome phase 3 reference panel**: Download from: https://cncr.nl/research/magma/
 Unpack reference panel `gunzip g1000_EUR.zip`.
+
+## ⚠️ Sample Overlap Notice
+
+For accurate Mendelian Randomization (MR) analysis, we **recommend using independent samples**. The BMM package **does not provide methods to calculate the sample overlap coefficient (\(\rho\))**.
+
+If your study may involve overlapping samples, you can use [MR.CUE](https://github.com/QingCheng0218/MR.CUE) to estimate \(\rho\). Install it with:
+
+```r
+library(devtools)
+install_github("QingCheng0218/MR.CUE@main")
+library(MR.CUE)
+```
+**Quick Example**
+Required Files
+1. Exposure and Outcome Summary Statistics
+
+
+**Table 1: Format for exposure and outcome data**
+
+| SNP       | chr | BP        | A1 | A2 | beta   | se     | pvalue |
+|-----------|-----|-----------|----|----|--------|--------|--------|
+| rs1000050 | 1   | 162736463 | C  | T  | 0.0002 | 0.0054 | 0.9705 |
+| rs1000073 | 1   | 157255396 | A  | G  | 0.0007 | 0.0038 | 0.8538 |
+| rs1000075 | 1   | 95166832  | T  | C  | -0.0028| 0.0040 | 0.4839 |
+| rs1000085 | 1   | 66857915  | C  | G  | 0.0020 | 0.0044 | 0.6494 |
+| rs1000127 | 1   | 63432716  | C  | T  | -0.0019| 0.0042 | 0.6510 |
+
+
+1. LD Reference Panel
+
+**Table 2: Format for reference panel data**
+
+| CHR | BlockID | SNP1       | SNP2       | r          |
+|-----|---------|------------|------------|------------|
+| 1   | 1       | rs12562034 | rs4040617  | -0.12635628|
+| 1   | 1       | rs12562034 | rs2980300  | -0.13086387|
+| 1   | 1       | rs12562034 | rs4475691  | 0.04401255 |
+| 1   | 1       | rs12562034 | rs1806509  | 0.09783578 |
+| 1   | 1       | rs12562034 | rs7537756  | 0.0371671  |
+
+```r
+# Load MR.CUE
+library(MR.CUE)
+
+# Example: define file paths (replace with your data)
+fileexp <- "BMICHR1CHR2CHR3.txt"  # Exposure data
+fileout <- "T2DCHR1CHR2CHR3.txt"  # Outcome data
+snpinfo <- "UK10Ksnpinforhm3.RDS" # SNP info
+filepan <- list(
+  "UK10KCHR1LDhm3.RDS",
+  "UK10KCHR2LDhm3.RDS",
+  "UK10KCHR3LDhm3.RDS"
+)
+
+# Use MR.CUE functions to estimate rho
+# See MR.CUE documentation for full usage
+```
 
 ## Quick Start
 ```r
