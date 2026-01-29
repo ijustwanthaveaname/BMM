@@ -1,11 +1,10 @@
 # BMM: Bayesian Mixture Model for Mendelian Randomization
 
-[![R-CMD-check](https://github.com/ijustwanthaveaname/BMM/workflows/R-CMD-check/badge.svg)](https://github.com/ijustwanthaveaname/BMM/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
 
-BMM implements a robust Bayesian mixture model for Mendelian Randomization that explicitly models horizontal pleiotropy with automatic model selection.
+MRBMM implements a robust Bayesian mixture model for Mendelian Randomization that explicitly models horizontal pleiotropy with automatic model selection.
 
 ### Key Features
 
@@ -26,9 +25,18 @@ install.packages("cmdstanr",
                 repos = c("https://mc-stan.org/r-packages/", 
                          getOption("repos")))
 
-# 2. Install CmdStan
+# 2. Install CmdStan, TwoSampleMR and ieugwasr
 cmdstanr::install_cmdstan()
-
+remotes::install_github("MRCIEU/TwoSampleMR")
+remotes::install_github("MRCIEU/ieugwasr")
+# OR install in 1 line 
+install_bmm_dependencies()
+# if failed use conda
+# conda install -c conda-forge cmdstan
+# Then, tell R where to find it
+library(cmdstanr)
+set_cmdstan_path("PATH_TO_YOUR_CONDA_ENV/bin/cmdstan") 
+# Usually: ~/miniconda3/bin/cmdstan 
 # 3. Install plink (system requirement)
 # Ubuntu/Debian: sudo apt-get install plink
 # macOS: brew install plink
@@ -39,16 +47,16 @@ cmdstanr::install_cmdstan()
 
 ```r
 # From GitHub
-devtools::install_github("ijustwanthaveaname/BMM")
+devtools::install_github("ijustwanthaveaname/MRBMM")
 
 # Or from source
-R CMD INSTALL BMM_1.0.0.tar.gz
+R CMD INSTALL MRBMM_1.0.0.tar.gz
 ```
 
 ## Quick Start
 
 ```r
-library(BMM)
+library(MRBMM)
 
 # ⚠️ CRITICAL: Set environment variable
 Sys.setenv(TBB_CXX_TYPE = "gcc")
@@ -56,21 +64,6 @@ Sys.setenv(TBB_CXX_TYPE = "gcc")
 # Paths to plink and reference panel
 PLINK_BIN <- "/usr/bin/plink"
 REF_PANEL <- "/data/1kg_eur/EUR"  # Without .bed/.bim/.fam extension
-
-# Run simulation
-sim <- simulate_mr_data(
-  J = 200,
-  theta_true = 0.2,
-  delta_true = 0.3
-)
-res <- run_bmm_analysis(
-  beta_X = sim$beta_X,
-  beta_Y = sim$beta_Y,
-  se_X   = sim$se_X,
-  se_Y   = sim$se_Y,
-  compiled_models = compiled
-)
-
 
 # Read GWAS summary statistics
 exposure <- read_gwas_data(
@@ -107,7 +100,7 @@ harmonized <- harmonize_for_mr(
 bmm_data <- extract_bmm_data(harmonized)
 
 # Compile Stan models (required each session, takes 1-2 min)
-compiled <- compile_stan_models()
+compiled <- compile_bmm_models()
 
 # Run BMM analysis
 results <- run_bmm_analysis(

@@ -114,10 +114,7 @@ install_bmm_dependencies <- function() {
 
   if (!requireNamespace("cmdstanr", quietly = TRUE)) {
     message("Installing cmdstanr...")
-    install.packages(
-      "cmdstanr",
-      repos = c("https://stan-dev.r-universe.dev", getOption("repos"))
-    )
+    remotes::install_github("stan-dev/cmdstanr")
   }
 
   message("✓ BMM dependencies installation complete")

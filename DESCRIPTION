@@ -1,13 +1,13 @@
-Package: BMM
+Package: MRBMM
 Type: Package
 Title: Bayesian Mixture Model for Mendelian Randomization
 Version: 1.0.0
 Date: 2024-01-28
 Authors@R: c(
-    person("Your", "Name", 
-           email = "your.email@university.edu", 
+    person("Wang", "Yinwei", 
+           email = "b627926373@gmail.com", 
            role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0000-0000-0000"))
+           comment = c(ORCID = "0000-0003-0474-9257"))
     )
 Description: Implements a robust Bayesian mixture model for Mendelian 
     randomization that explicitly models horizontal pleiotropy. Supports 
@@ -15,8 +15,8 @@ Description: Implements a robust Bayesian mixture model for Mendelian
     via LOO-CV. Includes Weighted Mode initialization (Hartwig et al. 2017) 
     and comprehensive GWAS data harmonization with local plink.
 License: MIT + file LICENSE
-URL: https://github.com/your-username/BMM
-BugReports: https://github.com/your-username/BMM/issues
+URL: https://github.com/ijustwanthaveaname/MRBMM
+BugReports: https://github.com/ijustwanthaveaname/MRBMM/issues
 Depends: 
     R (>= 4.0.0)
 Imports:
