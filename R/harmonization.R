@@ -20,7 +20,8 @@
 #' @keywords internal
 get_proxy <- function(exp_dat, otc_dat, r2 = 0.8, 
                      bin_plink, ref_panel, outfile = "proxy") {
-  
+  bin_plink  <- normalizePath(bin_plink, mustWork = TRUE)
+  ref_panel <- normalizePath(ref_panel, mustWork = TRUE)
   cat("  Searching for proxy SNPs...\n")
   exp.snp <- exp_dat$SNP
   otc.snp <- otc_dat$SNP
@@ -319,7 +320,7 @@ harmonize_for_mr <- function(exp_gwas, otc_gwas,
     cat(sprintf("Analyzing: %s -> %s\n", exp_name, otc_name))
     cat("========================================\n\n")
   }
-  
+  plink_bin <- normalizePath(plink_bin, mustWork = TRUE)
   # === Step 1: Validate inputs ===
   if (!file.exists(plink_bin)) {
     stop(sprintf("Plink binary not found: %s", plink_bin))
