@@ -2,18 +2,12 @@
 # GWAS Data Harmonization - Matching Real Data Evaluation Method
 # Uses local plink + reference panel for proxy SNP search
 ################################################################################
-
-# library(TwoSampleMR)  # Removed - use :: instead
-# library(ieugwasr)  # Removed - use :: instead
-# library(tidyverse)  # Removed - use :: instead
-# library(data.table)  # Removed - use :: instead
-# library(glue)  # Removed - use :: instead
-
-#' Find Proxy SNPs Using Local Plink and Reference Panel
+#' Find Proxy SNPs Using Local Plink and Reference Panel for Data Harmonization
 #' 
 #' Exactly matches the get_proxy function from real data evaluation
 #' Uses local plink to find LD proxies for missing SNPs
 #' 
+#' @importFrom magrittr %>%
 #' @param exp_dat Exposure data (TwoSampleMR formatted)
 #' @param otc_dat Outcome data (TwoSampleMR formatted)
 #' @param r2 Minimum LD r² threshold (default: 0.8)

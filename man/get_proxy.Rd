@@ -2,7 +2,7 @@
 % Please edit documentation in R/harmonization.R
 \name{get_proxy}
 \alias{get_proxy}
-\title{Find Proxy SNPs Using Local Plink and Reference Panel}
+\title{Find Proxy SNPs Using Local Plink and Reference Panel for Data Harmonization}
 \usage{
 get_proxy(exp_dat, otc_dat, r2 = 0.8, bin_plink, ref_panel, outfile = "proxy")
 }
