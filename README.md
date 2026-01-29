@@ -39,7 +39,7 @@ cmdstanr::install_cmdstan()
 
 ```r
 # From GitHub
-devtools::install_github("your-username/BMM")
+devtools::install_github("ijustwanthaveaname/BMM")
 
 # Or from source
 R CMD INSTALL BMM_1.0.0.tar.gz
@@ -56,6 +56,21 @@ Sys.setenv(TBB_CXX_TYPE = "gcc")
 # Paths to plink and reference panel
 PLINK_BIN <- "/usr/bin/plink"
 REF_PANEL <- "/data/1kg_eur/EUR"  # Without .bed/.bim/.fam extension
+
+# Run simulation
+sim <- simulate_mr_data(
+  J = 200,
+  theta_true = 0.2,
+  delta_true = 0.3
+)
+res <- run_bmm_analysis(
+  beta_X = sim$beta_X,
+  beta_Y = sim$beta_Y,
+  se_X   = sim$se_X,
+  se_Y   = sim$se_Y,
+  compiled_models = compiled
+)
+
 
 # Read GWAS summary statistics
 exposure <- read_gwas_data(
@@ -95,7 +110,7 @@ bmm_data <- extract_bmm_data(harmonized)
 compiled <- compile_stan_models()
 
 # Run BMM analysis
-results <- run_mr_model_comparison(
+results <- run_bmm_analysis(
   beta_X = bmm_data$beta_X,
   beta_Y = bmm_data$beta_Y,
   se_X = bmm_data$se_X,
@@ -177,5 +192,5 @@ MIT License - see LICENSE file
 
 ## Contact
 
-- Issues: https://github.com/your-username/BMM/issues
-- Email: your.email@university.edu
+- Issues: https://github.com/ijustwanthaveaname/BMM/issues
+- Email: b627926373@gmail.com

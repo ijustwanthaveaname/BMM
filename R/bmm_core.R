@@ -1743,7 +1743,25 @@ plot_theta_comparison <- function(result_3comp, result_4comp) {
 ################################################################################
 # PART 14: Simulation 
 ################################################################################
-
+#' Simulate Mendelian randomization summary data
+#'
+#' Generate simulated SNP-exposure and SNP-outcome summary statistics
+#' under a mixture model with valid instruments, correlated pleiotropy,
+#' uncorrelated horizontal pleiotropy, and null variants.
+#'
+#' @param J Number of SNPs.
+#' @param theta_true True causal effect.
+#' @param delta_true Pleiotropic effect size.
+#' @param prop_valid Proportion of valid instruments.
+#' @param prop_valid_uhp Proportion of valid instruments with UHP.
+#' @param prop_chp Proportion of correlated horizontal pleiotropy.
+#' @param prop_chp_uhp Proportion of CHP with UHP.
+#' @param prop_uhp Proportion of pure UHP variants.
+#' @param prop_null Proportion of null variants.
+#'
+#' @return A list containing simulated summary statistics and true parameters.
+#'
+#' @export
 simulate_mr_data <- function(J = 200, theta_true = 0, delta_true = 0.2,
                              prop_valid = 0.3, prop_valid_uhp = 0.1, 
                              prop_chp = 0.2, prop_chp_uhp = 0.1,

@@ -18,6 +18,13 @@
     }
     remotes::install_github("MRCIEU/TwoSampleMR")
   }
+    # Check TwoSampleMR
+  if (!requireNamespace("ieugwasr", quietly = TRUE)) {
+    if (!requireNamespace("remotes", quietly = TRUE)) {
+      install.packages("remotes")
+    }
+    remotes::install_github("MRCIEU/ieugwasr")
+  }
 }
 
 #' @keywords internal
