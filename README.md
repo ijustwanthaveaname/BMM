@@ -116,7 +116,7 @@ results <- run_bmm_analysis(
 )
 
 # View results
-summary(results)
+get_theta_estimates(results)
 ```
 
 ## Output
