@@ -160,7 +160,11 @@ get_proxy <- function(exp_dat, otc_dat, r2 = 0.8,
     otc_dat[otc_dat$SNP == rsid, ]$SNP <- miss.snp
   }
 
-  cat(sprintf("    Successfully found %d proxy SNPs\n", proxy_count))
+  cat(sprintf(
+  "    Found %d candidate proxy SNPs (before harmonization)\n",
+  proxy_count
+))
+
 
   return(otc_dat %>% dplyr::filter(SNP %in% exp.snp))
 }
