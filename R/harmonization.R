@@ -321,6 +321,53 @@ read_gwas_data <- function(file_path,
 #' # Extract for BMM
 #' bmm_data <- extract_bmm_data(harmonized)
 #' }
+#' Complete GWAS Harmonization Workflow
+#'
+#' Performs complete harmonization matching real data evaluation:
+#' 1. Read GWAS data
+#' 2. Filter exposure SNPs by p-value
+#' 3. Format for TwoSampleMR
+#' 4. LD clumping with local reference panel
+#' 5. Proxy SNP search with local plink
+#' 6. Harmonization
+#'
+#' @param exp_gwas Exposure GWAS data frame (from read_gwas_data)
+#' @param otc_gwas Outcome GWAS data frame (from read_gwas_data)
+#' @param exp_name Exposure trait name
+#' @param otc_name Outcome trait name
+#' @param plink_bin Path to plink executable (e.g., "/usr/bin/plink")
+#' @param ref_panel Path to reference panel WITHOUT extension (e.g., "/data/1kg_eur/EUR")
+#' @param pval_threshold P-value threshold for IV selection (default: 5e-8)
+#' @param clump_kb Clumping window in kb (default: 10000)
+#' @param clump_r2 Clumping r² threshold (default: 0.001)
+#' @param use_proxy Whether to search for proxy SNPs (default: TRUE)
+#' @param proxy_r2 Minimum r² for proxy SNPs (default: 0.8)
+#' @param temp_dir Temporary directory for plink output (default: tempdir())
+#' @param verbose Print progress messages (default: TRUE)
+#'
+#' @return Harmonized data frame from TwoSampleMR::harmonise_data()
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Read GWAS data
+#' exposure <- read_gwas_data("exposure.txt", ...)
+#' outcome <- read_gwas_data("outcome.txt", ...)
+#'
+#' # Harmonize
+#' harmonized <- harmonize_for_mr(
+#'   exp_gwas = exposure,
+#'   otc_gwas = outcome,
+#'   exp_name = "BMI",
+#'   otc_name = "CAD",
+#'   plink_bin = "/usr/bin/plink",
+#'   ref_panel = "/data/1kg_eur/EUR"
+#' )
+#'
+#' # Extract for BMM
+#' bmm_data <- extract_bmm_data(harmonized)
+#' }
 harmonize_for_mr <- function(exp_gwas, otc_gwas,
                              exp_name, otc_name,
                              plink_bin, ref_panel,
@@ -331,13 +378,40 @@ harmonize_for_mr <- function(exp_gwas, otc_gwas,
                              proxy_r2 = 0.8,
                              temp_dir = tempdir(),
                              verbose = TRUE) {
+  
+  # 内部警告处理函数
+  precision_handler <- function(w) {
+    msg <- w$message
+    
+    # 1. 捕获 EAF 转换/缺失警告
+    if (grepl("eaf column is (not numeric|missing|invalid)", msg, ignore.case = TRUE)) {
+      # 输出指定的英文消息
+      message("Note: The data lacks an EAF column. The potential outlier SNP filtering step cannot be performed.")
+      # 抑制原始警告
+      invokeRestart("muffleWarning")
+    } 
+    # 2. 精确捕获 X8 列名填充警告并完全忽略
+    else if (grepl("Missing column names filled in: 'X8'", msg, fixed = TRUE) ||
+             grepl("X8", msg, fixed = TRUE) && grepl("filled in", msg, ignore.case = TRUE)) {
+      # 完全抑制，不输出任何消息
+      invokeRestart("muffleWarning")
+    }
+    # 3. 其他类型的警告，保持原样显示
+    else {
+      # 对于其他警告，保持原样显示
+      # 可以在此添加其他特定的警告处理
+    }
+  }
+  
   if (verbose) {
     cat("\n========================================\n")
     cat(sprintf("Analyzing: %s -> %s\n", exp_name, otc_name))
     cat("========================================\n\n")
   }
+  
   plink_bin <- normalizePath(plink_bin, mustWork = TRUE)
   ref_panel <- path.expand(ref_panel)
+  
   # === Step 1: Validate inputs ===
   if (!file.exists(plink_bin)) {
     stop(sprintf("Plink binary not found: %s", plink_bin))
@@ -362,18 +436,24 @@ harmonize_for_mr <- function(exp_gwas, otc_gwas,
   # === Step 3: Format for TwoSampleMR ===
   if (verbose) cat("\nStep 3: Formatting data for TwoSampleMR...\n")
 
-  exp_dat <- TwoSampleMR::format_data(
-    exp_gwas_sig,
-    type = "exposure",
-    snp_col = "SNP",
-    beta_col = "BETA",
-    se_col = "SE",
-    effect_allele_col = "EA",
-    other_allele_col = "OA",
-    eaf_col = "EAF",
-    pval_col = "P",
-    chr_col = "CHR",
-    pos_col = "POS"
+  # 对 format_data 应用警告处理器
+  exp_dat <- withCallingHandlers(
+    {
+      TwoSampleMR::format_data(
+        exp_gwas_sig,
+        type = "exposure",
+        snp_col = "SNP",
+        beta_col = "BETA",
+        se_col = "SE",
+        effect_allele_col = "EA",
+        other_allele_col = "OA",
+        eaf_col = "EAF",
+        pval_col = "P",
+        chr_col = "CHR",
+        pos_col = "POS"
+      )
+    },
+    warning = precision_handler
   )
 
   exp_dat <- exp_dat %>% dplyr::mutate(
@@ -383,18 +463,23 @@ harmonize_for_mr <- function(exp_gwas, otc_gwas,
 
   if (verbose) cat(sprintf("  Exposure formatted: %d SNPs\n", nrow(exp_dat)))
 
-  otc_dat <- TwoSampleMR::format_data(
-    otc_gwas,
-    type = "outcome",
-    snp_col = "SNP",
-    beta_col = "BETA",
-    se_col = "SE",
-    effect_allele_col = "EA",
-    other_allele_col = "OA",
-    eaf_col = "EAF",
-    pval_col = "P",
-    chr_col = "CHR",
-    pos_col = "POS"
+  otc_dat <- withCallingHandlers(
+    {
+      TwoSampleMR::format_data(
+        otc_gwas,
+        type = "outcome",
+        snp_col = "SNP",
+        beta_col = "BETA",
+        se_col = "SE",
+        effect_allele_col = "EA",
+        other_allele_col = "OA",
+        eaf_col = "EAF",
+        pval_col = "P",
+        chr_col = "CHR",
+        pos_col = "POS"
+      )
+    },
+    warning = precision_handler
   )
 
   otc_dat <- otc_dat %>% dplyr::mutate(
@@ -455,24 +540,6 @@ harmonize_for_mr <- function(exp_gwas, otc_gwas,
   if (verbose) cat(sprintf("  Outcome SNPs available: %d\n", nrow(otc_dat)))
 
   # === Step 6: Harmonization ===
-  precision_handler <- function(w) {
-    msg <- w$message
-
-    # 1. 精确匹配 EAF 转换警告
-    # 原句: "eaf column is not numeric. Coercing..." 或类似关于缺失的提示
-    if (grepl("eaf column is (not numeric|missing)", msg, ignore.case = TRUE)) {
-      message("Warning: EAF column is missing or invalid. Potential outlier SNP filtering step cannot be performed.")
-      if (exists("muffleWarning", where = "package:base")) {
-        invokeRestart("muffleWarning")
-      }
-    }
-
-    # 2. 精确匹配 readr 的空列填充警告
-    # 原句: "Missing column names filled in: 'X8' [8]"
-    else if (grepl("Missing column names filled in: 'X8'", msg)) {
-      invokeRestart("muffleWarning")
-    }
-  }
   if (verbose) cat("\nStep 6: Harmonizing data...\n")
 
   harmonised_dat <- withCallingHandlers(
